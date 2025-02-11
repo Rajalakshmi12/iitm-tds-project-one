@@ -7,11 +7,7 @@
     },
     "routes": [
       {
-        "src": "/read",
-        "dest": "/api/project_api.py"
-      },
-      {
-        "src": "/run",
+        "src": "/(.*)",
         "dest": "/api/project_api.py"
       }
     ]
