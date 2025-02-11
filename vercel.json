@@ -5,6 +5,14 @@
         "runtime": "python"
       }
     },
+    {
+    "builds": [
+      {
+        "src": "api/project_api.py",
+        "use": "@vercel/python"
+      }
+    ]
+  },
     "routes": [
       {
         "src": "/(.*)",
