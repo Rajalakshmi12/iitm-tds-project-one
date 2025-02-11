@@ -4,11 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
 import uvicorn
-import re
-import os
-import json
-import requests
-import subprocess
 
 # Initialize FastAPI app
 app = FastAPI()
