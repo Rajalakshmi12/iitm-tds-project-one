@@ -24,6 +24,9 @@ app.add_middleware(
 # Set your proxy API key - not required for this API call
 # api_key = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZHMzMDAwMTQ5QGRzLnN0dWR5LmlpdG0uYWMuaW4ifQ.q_q9LIsqoM8So_zTtZkoHf_ppRlfrrzpzRenGNifW8k"
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello from FastAPI on Vercel!"}
 
 @app.post("/run")
 async def run_task(task: str = Query(..., title="Plain English Instruction")):
