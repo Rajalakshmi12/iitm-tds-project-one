@@ -1,22 +1,14 @@
 {
-    "version": 2,
-    "functions": {
-      "api/project_api.py": {
-        "runtime": "python"
-      }
-    },
-    {
-    "builds": [
-      {
-        "src": "api/project_api.py",
-        "use": "@vercel/python"
-      }
-    ]
+  "version": 2,
+  "functions": {
+    "api/project_api.py": {
+      "runtime": "@vercel/python"
+    }
   },
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "/api/project_api.py"
-      }
-    ]
-  }
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/project_api.py"
+    }
+  ]
+}
