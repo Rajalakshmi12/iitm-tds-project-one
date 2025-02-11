@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from bs4 import BeautifulSoup
 from typing import List
+import uvicorn
 import re
 import os
 import json
@@ -41,5 +42,10 @@ async def get_file(path: str = Query(..., title="File path to verify the exact o
         return {"status": "success"}
     else:
         raise HTTPException(status_code=400, detail="Invalid File path")
+    
+# Required for Vercel
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 # uvicorn project_api:app --host 0.0.0.0 --port 8000 --reload
