@@ -1,0 +1,18 @@
+{
+    "version": 2,
+    "functions": {
+      "api/project_api.py": {
+        "runtime": "python3.9"
+      }
+    },
+    "routes": [
+      {
+        "src": "/read",
+        "dest": "/api/project_api.py"
+      },
+      {
+        "src": "/run",
+        "dest": "/api/project_api.py"
+      }
+    ]
+  }
