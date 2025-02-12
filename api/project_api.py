@@ -4,6 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
 import uvicorn
+import os
+
+#Load the AI Proxy token from the environment
+AIPROXY_TOKEN = os.environ.get("AIPROXY_TOKEN")
+
+#Validate that the token is set
+if not AIPROXY_TOKEN:
+    raise ValueError("AIPROXY_TOKEN is not set. Please export it before running the script.")
 
 # Initialize FastAPI app
 app = FastAPI()
