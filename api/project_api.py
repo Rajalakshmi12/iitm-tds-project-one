@@ -8,7 +8,6 @@ import os
 
 #Load the AI Proxy token from the environment
 AIPROXY_TOKEN = os.environ.get("AIPROXY_TOKEN")
-print({AIPROXY_TOKEN})
 
 #Validate that the token is set
 if not AIPROXY_TOKEN:
