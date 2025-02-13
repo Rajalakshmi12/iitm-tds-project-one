@@ -8,6 +8,7 @@ import os
 
 #Load the AI Proxy token from the environment
 AIPROXY_TOKEN = os.environ.get("AIPROXY_TOKEN")
+print({AIPROXY_TOKEN})
 
 #Validate that the token is set
 if not AIPROXY_TOKEN:
@@ -23,9 +24,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Set your proxy API key - not required for this API call
-# api_key = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZHMzMDAwMTQ5QGRzLnN0dWR5LmlpdG0uYWMuaW4ifQ.q_q9LIsqoM8So_zTtZkoHf_ppRlfrrzpzRenGNifW8k"
 
 @app.get("/")
 def read_root():
