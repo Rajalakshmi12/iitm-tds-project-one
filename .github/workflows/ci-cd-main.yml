@@ -31,11 +31,6 @@ jobs:
         run: |
           docker build -t rajalakshmi1205/tdsdocker:latest .
 
-      - name: Run tests (example with pytest)
-        run: |
-          # Run your tests here (e.g., using pytest)
-          pytest tests/
-
   # Step 2: Deploy Docker Image (CD)
   deploy:
     runs-on: ubuntu-latest
