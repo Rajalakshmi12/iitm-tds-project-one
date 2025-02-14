@@ -29,7 +29,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t rajalakshmi1205/tdsdocker:latest .
+          docker build -t rajalakshmi1205/tdsdocker:latestv2 .
 
   # Step 2: Deploy Docker Image (CD)
   deploy:
@@ -48,9 +48,9 @@ jobs:
 
       - name: Build and push Docker image to Docker Hub
         run: |
-          docker build -t rajalakshmi1205/tdsdocker:latest .
-          docker push rajalakshmi1205/tdsdocker:latest
-          docker run -d -p 8000:8000 rajalakshmi1205/tdsdocker:latest
+          docker build -t rajalakshmi1205/tdsdocker:latestv2 .
+          docker push rajalakshmi1205/tdsdocker:latestv2
+          docker run -d -p 8000:8000 rajalakshmi1205/tdsdocker:latestv2
 
       - name: Deploy to production (or staging)
         run: |
