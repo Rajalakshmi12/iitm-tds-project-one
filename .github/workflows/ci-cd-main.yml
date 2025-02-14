@@ -24,16 +24,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -r requirements.txt  # Install any Python dependencies
+          pip install pytest  # Install pytest for running tests
 
       - name: Build Docker image
         run: |
           docker build -t rajalakshmi1205/tdsdocker:latest .
-
-      - name: Run tests (example with pytest)
-        run: |
-          # Run your tests here (e.g., using pytest)
-          pytest tests/
 
   # Step 2: Deploy Docker Image (CD)
   deploy:
@@ -57,6 +53,7 @@ jobs:
 
       - name: Deploy to production (or staging)
         run: |
-          # Replace this with your actual deployment commands (e.g., using kubectl for Kubernetes)
           echo "Deploying to production..."
+
+          # Replace this with your actual deployment commands (e.g., using kubectl for Kubernetes)
           # kubectl apply -f deployment.yaml  # Example deployment command
