@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 8000
 
 # Define the entrypoint
-CMD ["uvicorn", "project_api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "project_api_functions:app", "--host", "0.0.0.0", "--port", "8000"]
