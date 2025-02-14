@@ -50,6 +50,7 @@ jobs:
         run: |
           docker build -t rajalakshmi1205/tdsdocker:latest .
           docker push rajalakshmi1205/tdsdocker:latest
+          docker run -d -p 8000:8000 rajalakshmi1205/tdsdocker:latest
 
       - name: Deploy to production (or staging)
         run: |
