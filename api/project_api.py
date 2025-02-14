@@ -84,7 +84,8 @@ def call_ai_proxy(prompt: str):
     try:
         # Send the POST request
         response = requests.post(url, json=data, headers=headers, timeout=50)
-        return response.json()['choices'][0]['message']['content'].strip()
+        #return response.json()['choices'][0]['message']['content'].strip()
+        return response.json()
     except Exception as e:
         print(f"Error calling AI Proxy: {e}")
         return None
