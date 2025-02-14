@@ -3,6 +3,7 @@ from fastapi.responses import ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
+import openai
 import uvicorn
 import os
 import json
@@ -94,3 +95,16 @@ async def get_file(path: str = Query(..., title="File path to verify the exact o
             return {"content": file.read()}
     else:
         raise HTTPException(status_code=404, detail="File not found")
+
+# Example usage (task description passed to the function)
+if __name__ == "__main__":
+    # Set up the AI Proxy token and model
+    AIPROXY_TOKEN = os.getenv("AIPROXY_TOKEN")
+    openai.api_key = AIPROXY_TOKEN  # Use the token for the AI Proxy (GPT-4o-Mini)
+
+    # Config directory for storing files
+    project_root = os.getcwd()  # Project root folder
+    config = {"root": f"{project_root}/data"}
+
+    task_description = "The file /data/dates.txt contains a list of dates, one per line. Count the number of Wednesdays in the list, and write just the number to /data/dates-wednesdays.txt"
+    execute_task(task_description)
