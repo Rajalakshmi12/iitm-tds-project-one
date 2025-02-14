@@ -57,6 +57,7 @@ jobs:
 
       - name: Deploy to production (or staging)
         run: |
-          # Replace this with your actual deployment commands (e.g., using kubectl for Kubernetes)
           echo "Deploying to production..."
+
+          # Replace this with your actual deployment commands (e.g., using kubectl for Kubernetes)
           # kubectl apply -f deployment.yaml  # Example deployment command
