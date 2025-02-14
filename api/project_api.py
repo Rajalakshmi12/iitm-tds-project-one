@@ -5,18 +5,18 @@ from pydantic import BaseModel
 from typing import List
 import uvicorn
 import os
+import json
+import re
+from datetime import datetime
+import requests
 
-import os
-
-for key, value in os.environ.items():
-    print(f"{key}={value}")
-    
-#Load the AI Proxy token from the environment
+# Load the AI Proxy token from the environment
 AIPROXY_TOKEN = os.environ.get("AIPROXY_TOKEN")
 
-#Validate that the token is set
+# Validate that the token is set
 if not AIPROXY_TOKEN:
-    raise ValueError("AIPROXY_TOKEN is not set. Please export it before running the script.")
+    AIPROXY_TOKEN = ""
+    #raise ValueError("AIPROXY_TOKEN is not set. Please export it before running the script.")
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -29,27 +29,68 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello from FastAPI after running podman!"}
+def count_wednesdays(file_path: str):
+    """Count Wednesdays in a given dates file and write to output."""
+    with open(file_path, 'r') as file:
+        dates = file.readlines()
 
+    wednesday_count = sum(1 for date in dates if datetime.strptime(date.strip(), '%d/%m/%Y').weekday() == 2)  # 2 = Wednesday
+    with open('/data/dates-wednesdays.txt', 'w') as output_file:
+        output_file.write(str(wednesday_count))
+    return f"Number of Wednesdays: {wednesday_count}"
+
+def sort_contacts(file_path: str):
+    """Sort contacts by last name, then first name, and save to a new file."""
+    with open(file_path, 'r') as file:
+        contacts = json.load(file)
+    
+    sorted_contacts = sorted(contacts, key=lambda x: (x['last_name'], x['first_name']))
+    
+    with open('/data/contacts-sorted.json', 'w') as output_file:
+        json.dump(sorted_contacts, output_file, indent=4)
+    return "Contacts sorted successfully"
+
+def write_first_log_line(file_path: str):
+    """Write the first line of the 10 most recent log files to a new file."""
+    log_files = sorted([f for f in os.listdir(file_path) if f.endswith('.log')], reverse=True)
+    
+    with open('/data/logs-recent.txt', 'w') as output_file:
+        for log_file in log_files[:10]:
+            with open(os.path.join(file_path, log_file), 'r') as log:
+                first_line = log.readline()
+                output_file.write(first_line + "\n")
+    return "First lines of recent logs written successfully"
+
+# Endpoint to handle task automation
 @app.post("/run")
 async def run_task(task: str = Query(..., title="Plain English Instruction")):
-    if not task:
-        raise HTTPException(status_code=400, detail="Query parameter task is required")    
-    return {"message": "Yes", "task": task}
+    """Run the requested task based on the plain English description."""
+    try:
+        if "data generation" in task.lower():
+            user_email = "user@example.com"  # Replace with actual logic to extract email
+            return {"message": run_datagen_script(user_email)}
+        
+        if "count wednesdays" in task.lower():
+            return {"message": count_wednesdays("/data/dates.txt")}
+        
+        if "sort contacts" in task.lower():
+            return {"message": sort_contacts("/data/contacts.json")}
+        
+        if "write first log line" in task.lower():
+            return {"message": write_first_log_line("/data/logs/")}
+        
+        # Add more conditions for other tasks here (A4 to A10)
+
+        raise HTTPException(status_code=400, detail="Task not recognized")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/read")
 async def get_file(path: str = Query(..., title="File path to verify the exact output")):
-    path = "Rectify"
-    if(path=="Rectify"):
-        return {"status": "success"}
+    """Return the content of a specified file."""
+    if os.path.exists(path):
+        with open(path, 'r') as file:
+            return {"content": file.read()}
     else:
-        raise HTTPException(status_code=400, detail="Invalid File path")
-    
-# Required for Vercel
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
-# uvicorn project_api:app --host 0.0.0.0 --port 8000 --reload
+        raise HTTPException(status_code=404, detail="File not found")
