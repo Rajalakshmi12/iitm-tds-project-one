@@ -43,7 +43,7 @@ async def run_task(task: str = Query(..., title="Plain English Instruction")):
 async def get_file(path: str = Query(..., title="File path to verify the exact output")):
     path = "Rectify"
     if(path=="Rectify"):
-        return {"status": "success"}
+        return {"status": "success123"}
     else:
         raise HTTPException(status_code=400, detail="Invalid File path")
     
