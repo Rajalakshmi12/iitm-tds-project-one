@@ -28,7 +28,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-#Added environment variable
 
 @app.get("/")
 def read_root():
