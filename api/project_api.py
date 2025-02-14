@@ -6,6 +6,11 @@ from typing import List
 import uvicorn
 import os
 
+import os
+
+for key, value in os.environ.items():
+    print(f"{key}={value}")
+    
 #Load the AI Proxy token from the environment
 AIPROXY_TOKEN = os.environ.get("AIPROXY_TOKEN")
 
@@ -26,7 +31,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello from FastAPI on Vercel!"}
+    return {"message": "Hello from FastAPI after running podman!"}
 
 @app.post("/run")
 async def run_task(task: str = Query(..., title="Plain English Instruction")):

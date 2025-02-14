@@ -17,5 +17,8 @@ COPY . .
 # Expose port 8000
 EXPOSE 8000
 
+#Environment variables:
+ENV AIPROXY_TOKEN=${AIPROXY_TOKEN}
+
 # Define the entrypoint
 CMD ["uvicorn", "project_api:app", "--host", "0.0.0.0", "--port", "8000"]
