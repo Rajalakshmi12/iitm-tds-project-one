@@ -62,6 +62,55 @@ def write_first_log_line(file_path: str):
                 output_file.write(first_line + "\n")
     return "First lines of recent logs written successfully"
 
+def call_ai_proxy(prompt: str):
+    # Define the API URL provided as per the instructions from the course
+    url = "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions"
+    # Define the headers
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {AIPROXY_TOKEN}",
+    }
+    
+    # Define the data payload with model, prompt, and other parameters
+    data = {
+        "model": "gpt-4o-mini",  # Use GPT-4o-Mini for task parsing
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
+        "max_tokens": 100,  # Limit to ensure the response is concise
+        "temperature": 0.7,  # Control the creativity of the response
+    }
+
+    try:
+        # Send the POST request
+        response = requests.post(url, json=data, headers=headers, timeout=50)
+        return response.json()['choices'][0]['message']['content'].strip()
+    except Exception as e:
+        print(f"Error calling AI Proxy: {e}")
+        return None
+    
+def execute_task(task_description: str):
+    # Generate a concise prompt based on the task description
+    prompt = f"Parse the task: '{task_description}' and determine what action to perform. Provide only the action, no additional explanation."
+
+    # Call the AI Proxy to parse the task
+    action = call_ai_proxy(prompt)
+
+    if action:
+        print(f"Action determined by LLM: {action}")
+
+        # Match action to specific tasks
+        if "format" in action.lower() and "markdown" in action.lower():
+            format_markdown()
+        elif "count" in action.lower() and "wednesday" in action.lower():
+            count_wednesdays()
+        elif "sort" in action.lower() and "contacts" in action.lower():
+            sort_contacts()
+        else:
+            print(f"Unknown action: {action}")
+    else:
+        print("No valid action found from the AI Proxy.")
+
 # Endpoint to handle task automation
 @app.post("/run")
 async def run_task(task: str = Query(..., title="Plain English Instruction")):
