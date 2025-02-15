@@ -4,3 +4,4 @@ uvicorn
 openai
 asyncio
 python-dateutil
+numpy
