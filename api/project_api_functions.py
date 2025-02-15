@@ -142,30 +142,36 @@ async def run_task(task: str = Query(..., title="Plain English Instruction")):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+def get_full_path(file_path: str):
+    # Ensure the file path is not trying to navigate outside the allowed project directory
+    if os.path.isabs(file_path):
+        # If it's an absolute path, make sure it's within the project root directory
+        return os.path.join(project_root, file_path.lstrip('/'))  # lstrip removes the leading "/"
+    else:
+        # If it's a relative path, just join it with the project root
+        return os.path.join(project_root, file_path)
+    
 @app.get("/read")
 async def get_file(path: str = Query(..., title="File path to verify the exact output")):
+    full_path = get_full_path(path)
+
     # Return the content of the specified file
-    if os.path.exists(path):
-        with open(path, 'r') as file:
+    if os.path.exists(full_path):
+        with open(full_path, 'r') as file:
             return {"content": file.read()}
     else:
         raise HTTPException(status_code=404, detail="File not found")
     
 @app.get("/")
 async def say_hello():
-    path = "/data/dates.txt"
-    
-    if os.path.exists(path):
-        with open(path, 'r') as file:
-            print({"Latest content": file.read()})
-    else:
-        raise HTTPException(status_code=404, detail="File not found")
+    return "New Message"
 
 if __name__ == "__main__":
     path = "/data/dates.txt"
-    
-    if os.path.exists(path):
-        with open(path, 'r') as file:
+    full_path = get_full_path(path)
+
+    if os.path.exists(full_path):
+        with open(full_path, 'r') as file:
             print({"content": file.read()})
     else:
         raise HTTPException(status_code=404, detail="File not found")
