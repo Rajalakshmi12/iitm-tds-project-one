@@ -156,7 +156,7 @@ def calculate_ticket_sales(desc):
         with open(OUTPUT_FILE, "w") as file:
             file.write(str(total_sales))
 
-        return f"Total sales for 'Gold' tickets: {total_sales}"
+        return f"Total sales for {ticket_type} tickets: {total_sales}"
 
     except Exception as e:
         print(f"Error: {e}")
