@@ -153,7 +153,13 @@ async def get_file(path: str = Query(..., title="File path to verify the exact o
     
 @app.get("/")
 async def say_hello():
-    return "Hello, Welcome to the custom API endpoints"
+    path = "/data/dates.txt"
+    
+    if os.path.exists(path):
+        with open(path, 'r') as file:
+            print({"content": file.read()})
+    else:
+        raise HTTPException(status_code=404, detail="File not found")
 
 if __name__ == "__main__":
     path = "/data/dates.txt"
