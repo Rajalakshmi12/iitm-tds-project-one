@@ -2,6 +2,12 @@
 FROM python:3.9-slim 
 #Layer1
 
+# Use official Node.js image to support Prettier
+FROM node:18 AS prettier
+
+# Install Prettier globally
+RUN npm install -g prettier@3.4.2
+
 # Set the working directory
 WORKDIR /app
 #Layer2

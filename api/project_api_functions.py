@@ -5,12 +5,16 @@ import asyncio
 import openai
 import uvicorn
 import os
+import subprocess
 import json
 import requests
 from datetime import datetime
+import markdown
+
 
 # Load the AI Proxy token from the environment
-AIPROXY_TOKEN = os.environ.get("AIPROXY_TOKEN")
+AIPROXY_TOKEN = os.getenv("AIPROXY_TOKEN", "").strip().strip('"')
+
 
 # Validate that the token is set
 if not AIPROXY_TOKEN:
@@ -69,6 +73,8 @@ def write_first_log_line(file_path: str):
 def call_ai_proxy(prompt: str):
     # Define the API URL provided as per the instructions from the course
     url = "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions"
+    print(url)
+    
     # Define the headers
     headers = {
         "Content-Type": "application/json",
@@ -93,6 +99,25 @@ def call_ai_proxy(prompt: str):
         print(f"Error calling AI Proxy: {e}")
         return None
 
+
+
+
+def format_markdown(file_path: str):
+    
+    # Move this to a function
+    if not (path.startswith("/data/") or path.startswith("data/")):
+        raise HTTPException(status_code=400, detail="Raji Access to this path is not allowed. Only files under '/data' are allowed.")
+    
+    full_path = get_full_path(file_path)
+    print(f"fullpath: {full_path}")
+    
+    # Return the content of the specified file
+    if os.path.exists(full_path):    
+        os.system(f'npx prettier@3.4.2 --write "{full_path}"')
+        print(f"Formatted: {full_path}")
+
+
+    
 # Task execution handler
 def execute_task(task_description: str):
     # Generate a concise prompt based on the task description
@@ -102,19 +127,22 @@ def execute_task(task_description: str):
     action = call_ai_proxy(prompt)
 
     if action:
-        print(f"Action determined by LLM: {action}")
+        content = action['choices'][0]['message']['content']
+        print(f"Action determined by LLM: {content}")
 
         # Match action to specific tasks
-        if "format" in action.lower() and "markdown" in action.lower():
-            format_markdown()
-        elif "count" in action.lower() and "wednesday" in action.lower():
+        if "format" in content.lower() and "prettier" in content.lower():
+            print("calling markdown")
+            format_markdown("/data/format.md")
+
+        elif "count" in content.lower() and "wednesday" in content.lower():
             return count_wednesdays(f"{config['root']}/dates.txt")
-        elif "sort" in action.lower() and "contacts" in action.lower():
+        elif "sort" in content.lower() and "contacts" in content.lower():
             return sort_contacts(f"{config['root']}/contacts.json")
-        elif "log" in action.lower() and "write" in action.lower():
+        elif "log" in content.lower() and "write" in content.lower():
             return write_first_log_line(f"{config['root']}/logs/")
         else:
-            return f"Unknown action: {action}"
+            return f"Unknown action: {content}"
     else:
         return "No valid action found from the AI Proxy."
 
@@ -123,8 +151,6 @@ def get_full_path(file_path: str):
     print(file_path)
     if os.path.isabs(file_path):
         # If it's an absolute path, make sure it's within the project root directory
-        print(os.path.join(project_root, file_path.lstrip('/')))
-
         return os.path.join(project_root, file_path.lstrip('/'))  # lstrip removes the leading "/"
     else:
         return os.path.join(project_root, file_path)
@@ -162,11 +188,20 @@ async def say_hello():
 if __name__ == "__main__":
     path = "/data/dates.txt"
     
+    #Code1
     full_path = get_full_path(path)
-    print(full_path)
 
     if os.path.exists(full_path):
         with open(full_path, 'r') as file:
-            print({"content": file.read()})
+            #print({"content exist": file.read()})
+            print("content exist")
     else:
         raise HTTPException(status_code=404, detail="File not found")
+    
+    #Code3
+    print(execute_task("count wednesday"))
+    print(execute_task("log write"))
+    print(execute_task("sort contacts"))
+    
+
+    
