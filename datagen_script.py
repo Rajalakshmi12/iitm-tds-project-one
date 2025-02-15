@@ -197,6 +197,7 @@ Content-Transfer-Encoding: quoted-printable
 
 
 def get_credit_card(email):
+    email="23ds3000149@ds.study.iitm.ac.in"
     fake = Faker()
     fake.seed_instance(num(f"{email}:a8"))
     return {
@@ -274,28 +275,4 @@ def a10_ticket_sales():
 
 
 if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("email")
-    parser.add_argument("--root", default="/data")
-    args = parser.parse_args()
-    config["email"] = args.email
-    config["root"] = os.path.abspath(args.root)
-
-    os.makedirs(config["root"], exist_ok=True)
-
-    print("DISCLAIMER: THIS SCRIPT WILL CHANGE BEFORE THE EVALUATION. TREAT THIS AS A GUIDE.")
-    print("Files created at", config["root"])
-
-    a2_format_markdown()
-    a3_dates()
-    a4_contacts()
-    a5_logs()
-    a6_docs()
-    a7_email()
     a8_credit_card_image()
-    a9_comments()
-    a10_ticket_sales()
-
-# DISCLAIMER: THIS SCRIPT WILL CHANGE BEFORE THE EVALUATION. TREAT THIS AS A GUIDE.
