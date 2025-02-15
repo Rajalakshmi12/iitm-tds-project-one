@@ -1,13 +1,12 @@
 import requests
 import os
 
-token = os.getenv("AIPROXY_TOKEN", "").strip().strip('"')
+AIPROXY_TOKEN = os.getenv("AIPROXY_TOKEN", "").strip().strip('"')
 
 url = "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions"
 headers = {
     "Content-Type": "application/json",
-    "Authorization": f"Bearer {token}"
-    
+    "Authorization": f"Bearer {AIPROXY_TOKEN}",   
     
 }
 data = {

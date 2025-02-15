@@ -197,9 +197,8 @@ if __name__ == "__main__":
         raise HTTPException(status_code=404, detail="File not found")
     
     #Code3
-    print(execute_task("count wednesday"))
     print(execute_task("log write"))
     print(execute_task("sort contacts"))
-    
+    print(execute_task("something new"))
 
     
