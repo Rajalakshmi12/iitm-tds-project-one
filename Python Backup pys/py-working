@@ -5,7 +5,6 @@ import asyncio
 import openai
 import uvicorn
 import os
-import sqlite3
 import subprocess
 import json
 import requests
@@ -128,43 +127,7 @@ def format_markdown(file_path: str):
         os.system(f'npx prettier@3.4.2 --write "{full_path}"')
         print(f"Formatted: {full_path}")
 
-def calculate_gold_ticket_sales():
-    # Config directory for storing files
-    path = "/data/ticket-sales.db"
-    output_path = "/data/ticket-sales-gold.txt"
-    DB_PATH = get_full_path(path)
-    OUTPUT_FILE = get_full_path(output_path)
 
-    try:
-        # Connect to SQLite database
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-
-        # Query to calculate total sales for 'Gold' ticket type
-        cursor.execute("SELECT SUM(units * price) FROM tickets WHERE type = 'Gold'")
-        total_sales = cursor.fetchone()[0] or 0  # Default to 0 if no sales
-
-        # Write the total sales to the output file
-        with open(OUTPUT_FILE, "w") as file:
-            file.write(str(total_sales))
-
-        return f"Total sales for 'Gold' tickets: {total_sales}"
-
-    except Exception as e:
-        print(f"Error: {e}")
-
-    finally:
-        conn.close()
-    
-def get_full_path(file_path: str):
-    
-    print(file_path)
-    if os.path.isabs(file_path):
-        # If it's an absolute path, make sure it's within the project root directory
-        return os.path.join(project_root, file_path.lstrip('/'))  # lstrip removes the leading "/"
-    else:
-        return os.path.join(project_root, file_path)
-    
     
 # Task execution handler
 def execute_task(task_description: str):
@@ -189,13 +152,19 @@ def execute_task(task_description: str):
             return sort_contacts(f"{config['root']}/contacts.json")
         elif "log" in content.lower() and "write" in content.lower():
             return write_first_log_line(f"{config['root']}/logs/")
-        elif ("ticket" in content.lower() and "sales" in content.lower()) or ("gold" in content.lower() and "total" in content.lower()):
-            return calculate_gold_ticket_sales()
         else:
             return f"Unknown action: {content}"
     else:
         return "No valid action found from the AI Proxy."
 
+def get_full_path(file_path: str):
+    
+    print(file_path)
+    if os.path.isabs(file_path):
+        # If it's an absolute path, make sure it's within the project root directory
+        return os.path.join(project_root, file_path.lstrip('/'))  # lstrip removes the leading "/"
+    else:
+        return os.path.join(project_root, file_path)
     
 # Endpoint to handle task automation
 @app.post("/run")
@@ -244,5 +213,6 @@ if __name__ == "__main__":
     # print(execute_task("log write"))
     # print(execute_task("sort contacts"))
     print(execute_task("count wednesday"))
-    print(execute_task("ticket sales"))
+    print(execute_task("Format+/data/format.md+with+prettier+3.4.2"))
+
     
