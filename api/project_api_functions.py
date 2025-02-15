@@ -262,9 +262,9 @@ def execute_task(task_description: str):
             return sort_contacts(f"{config['root']}/contacts.json")
         elif "log" in content.lower() and "write" in content.lower():
             return write_first_log_line(f"{config['root']}/logs/")
-        elif ("analyze" in content.lower() and "tickets" in content.lower()) or ("analyze" in content.lower() and "sales" in content.lower()):
+        elif "analyze" in content.lower() and "tickets" in content.lower():
             return calculate_gold_ticket_sales()
-        elif ("comments" in content.lower() and "similarity" in content.lower()) or ("compare" in content.lower() and "similar" in content.lower()):
+        elif "comments" in content.lower() or "similarity" in content.lower() or "similar" in content.lower():
             return find_most_similar_comments(f"{config['root']}/comments.txt")
         else:
             return f"Unknown action: {content}"
@@ -320,5 +320,5 @@ if __name__ == "__main__":
     # print(execute_task("sort contacts"))
     print(execute_task("count wednesday"))
     print(execute_task("analyze sales for gold tickets"))
-    print(execute_task("find most similar comments"))
+    print(execute_task("similar comments"))
     
