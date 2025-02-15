@@ -3,6 +3,7 @@ from fastapi.responses import ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
+import asyncio
 import openai
 import uvicorn
 import os
@@ -143,9 +144,22 @@ async def run_task(task: str = Query(..., title="Plain English Instruction")):
 
 @app.get("/read")
 async def get_file(path: str = Query(..., title="File path to verify the exact output")):
-    """Return the content of a specified file."""
+    # Return the content of the specified file
     if os.path.exists(path):
         with open(path, 'r') as file:
             return {"content": file.read()}
+    else:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+@app.get("/")
+async def say_hello():
+    return "Hello, Welcome to the custom API endpoints"
+
+if __name__ == "__main__":
+    path = "/data/dates.txt"
+    
+    if os.path.exists(path):
+        with open(path, 'r') as file:
+            print({"content": file.read()})
     else:
         raise HTTPException(status_code=404, detail="File not found")
