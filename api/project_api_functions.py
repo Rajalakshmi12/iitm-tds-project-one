@@ -121,7 +121,7 @@ def call_ai_proxy(prompt: str):
 def format_markdown(file_path: str):
     
     # Move this to a function
-    if not (path.startswith("/data/") or path.startswith("data/")):
+    if not (file_path.startswith("/data/") or file_path.startswith("data/")):
         raise HTTPException(status_code=400, detail="Raji Access to this path is not allowed. Only files under '/data' are allowed.")
     
     full_path = get_full_path(file_path)
@@ -336,6 +336,46 @@ def extract_email_address():
         print("Error: No valid response from LLM.")
 
 
+def extract_h1_title():
+    DOCS_DIR = get_full_path("/data/docs")
+
+    try:
+        with open(DOCS_DIR, "r", encoding="utf-8") as file:
+            for line in file:
+                match = re.match(r"^# (.+)", line.strip())  # Look for first # Title
+                if match:
+                    return match.group(1)  # Return the extracted title
+        return None  # No H1 title found
+    except Exception as e:
+        print(f"Error reading {DOCS_DIR}: {e}")
+        return None
+    
+def parse_files_and_create_index():
+    DOCS_DIR = get_full_path("/data/docs")
+    OUTPUT_FILE = get_full_path("/data/docs/index.json")
+    
+    """Finds all Markdown files in /data/docs and creates an index.json file."""
+    index = {}
+
+    if not os.path.exists(DOCS_DIR):
+        print(f"Error: Directory {DOCS_DIR} does not exist.")
+        return
+
+    # Walk through all Markdown files in /data/docs/
+    for root, _, files in os.walk(DOCS_DIR):
+        for file in files:
+            if file.endswith(".md"):  # Only process .md files
+                file_path = os.path.join(root, file)
+                title = extract_h1_title() or "Untitled"
+                relative_path = os.path.relpath(file_path, DOCS_DIR)  # Remove /data/docs/ prefix
+                index[relative_path] = title
+
+    # Write index.json
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as json_file:
+        json.dump(index, json_file, indent=4)
+
+    print(f"Index file created at {OUTPUT_FILE}")
+    
 # Task execution handler
 def execute_task(task_description: str):
     # Generate a concise prompt based on the task description
@@ -350,7 +390,6 @@ def execute_task(task_description: str):
 
         # Match action to specific tasks
         if "format" in content.lower() and "prettier" in content.lower():
-            print("calling markdown")
             format_markdown("/data/format.md")
 
         elif "count" in content.lower() and "wednesday" in content.lower():
@@ -364,10 +403,12 @@ def execute_task(task_description: str):
         elif "comments" in content.lower() or "similarity" in content.lower() or "similar" in content.lower():
             return find_most_similar_comments(f"{config['root']}/comments.txt")
         
-        elif "email" in content.lower() or "extract" in content.lower():
+        elif "email" in content.lower() and "extract" in content.lower():
             return extract_email_address()
         elif "clone" in content.lower() or "commit" in content.lower():
             return clone_and_commit(task_description)
+        elif "markdown" in content.lower() and "title" in content.lower():
+            return parse_files_and_create_index()
         elif "delete" in content.lower() and "file" in content.lower():
             return "Task recognized, but no deletion is allowed."
         else:
@@ -416,5 +457,5 @@ if __name__ == "__main__":
     # print(execute_task("delete this file"))
     # print(execute_task("similar comments")
     # print(execute_task("extract email"))
-    print(execute_task("extract email"))
+    print(execute_task("extract markdown title"))
     # print(execute_task("clone commit repo url=https://github.com/octocat/Hello-World.git"))
