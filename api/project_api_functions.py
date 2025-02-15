@@ -170,7 +170,7 @@ def get_full_path(file_path: str):
 def find_most_similar_comments(path):
 
     # Define paths
-    COMMENTS_FILE = get_full_path(path)
+    COMMENTS_FILE = get_full_path("/data/comments.txt")
     
     output_path = "/data/comments-similar.txt"
     OUTPUT_FILE = get_full_path(output_path)
