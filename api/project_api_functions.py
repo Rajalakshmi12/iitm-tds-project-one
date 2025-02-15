@@ -9,6 +9,7 @@ import subprocess
 import json
 import requests
 from datetime import datetime
+import dateutil.parser  # To auto-detect date formats
 
 # Load the AI Proxy token from the environment
 AIPROXY_TOKEN = os.getenv("AIPROXY_TOKEN", "").strip().strip('"')
@@ -36,11 +37,23 @@ app.add_middleware(
 # Task functions
 
 def count_wednesdays(file_path: str):
-    """Count Wednesdays in a given dates file and write to output."""
+    wednesday_count = 0
+
+    """Count Wednesdays in a given dates file and write to output file as mentioned in the Project Requirement"""
     with open(file_path, 'r') as file:
-        dates = file.readlines()
+        for line in file:
+            date_str = line.strip()
+            try:
+                # Automatically detect and parse date format
+                date_obj = dateutil.parser.parse(date_str)
+                
+                # Check if it's a Wednesday (2 = Wednesday)
+                if date_obj.weekday() == 2:
+                    wednesday_count += 1
+
+            except ValueError:
+                print(f"Skipping invalid date: {date_str}")
     
-    wednesday_count = sum(1 for date in dates if datetime.strptime(date.strip(), '%d/%m/%Y').weekday() == 2)  # 2 = Wednesday
     with open(f'{config["root"]}/dates-wednesdays.txt', 'w') as output_file:
         output_file.write(str(wednesday_count))
     return f"Number of Wednesdays: {wednesday_count}"
@@ -197,8 +210,9 @@ if __name__ == "__main__":
         raise HTTPException(status_code=404, detail="File not found")
     
     #Code3
-    print(execute_task("log write"))
-    print(execute_task("sort contacts"))
-    print(execute_task("something new"))
+    # print(execute_task("log write"))
+    # print(execute_task("sort contacts"))
+    print(execute_task("count wednesday"))
+    print(execute_task("Format+/data/format.md+with+prettier+3.4.2"))
 
     
