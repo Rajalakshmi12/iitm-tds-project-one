@@ -7,7 +7,6 @@ import openai
 import uvicorn
 import json
 import os
-import shutil
 import re
 import sqlite3
 import subprocess
@@ -256,9 +255,6 @@ def clone_and_commit(task: str):
 
     GIT_WORKING_DIR= get_full_path(full_git_path)
     
-    # Clean up previous clone
-    if os.path.exists(GIT_WORKING_DIR):
-        shutil.rmtree(GIT_WORKING_DIR)
 
     try:
         # Clone the repo

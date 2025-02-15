@@ -4,4 +4,3 @@ uvicorn
 openai
 python-dateutil
 numpy
-shutil
