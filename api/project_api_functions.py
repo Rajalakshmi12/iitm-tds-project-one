@@ -329,7 +329,7 @@ def extract_email_address():
             with open(OUTPUT_FILE, "w", encoding="utf-8") as file:
                 file.write(sender_email)
 
-            print(f"Sender's email extracted and saved: {sender_email}")
+            return f"Sender's email extracted and saved: {sender_email}"
         else:
             print("Error: No valid email found in the response.")
     else:
@@ -364,7 +364,7 @@ def execute_task(task_description: str):
         elif "comments" in content.lower() or "similarity" in content.lower() or "similar" in content.lower():
             return find_most_similar_comments(f"{config['root']}/comments.txt")
         
-        elif "email" in content.lower() and "extract" in content.lower():
+        elif "email" in content.lower() or "extract" in content.lower():
             return extract_email_address()
         elif "clone" in content.lower() or "commit" in content.lower():
             return clone_and_commit(task_description)
@@ -415,5 +415,6 @@ if __name__ == "__main__":
     # print(execute_task("find total sales of gold tickets"))
     # print(execute_task("delete this file"))
     # print(execute_task("similar comments")
+    # print(execute_task("extract email"))
     print(execute_task("extract email"))
     # print(execute_task("clone commit repo url=https://github.com/octocat/Hello-World.git"))
