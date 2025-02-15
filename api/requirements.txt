@@ -3,4 +3,3 @@ fastapi
 uvicorn
 openai
 asyncio
-markdown

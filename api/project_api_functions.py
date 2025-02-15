@@ -9,8 +9,6 @@ import subprocess
 import json
 import requests
 from datetime import datetime
-import markdown
-
 
 # Load the AI Proxy token from the environment
 AIPROXY_TOKEN = os.getenv("AIPROXY_TOKEN", "").strip().strip('"')
