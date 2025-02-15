@@ -1,11 +1,14 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional
 import asyncio
 import openai
 import uvicorn
 import json
 import os
+import shutil
+import re
 import sqlite3
 import subprocess
 import json
@@ -239,6 +242,47 @@ def get_embedding(text):
         print(f"Error processing API response: {e}")
         return None
 
+def clone_and_commit(task: str):
+    # Get the repo url from the description from the link
+    match = re.search(r"repo\s*url\s*=\s*(\S+)", task, re.IGNORECASE)
+    url_repo = match.group(1) if match else None
+
+    if not url_repo:
+        return {"message": "Please provide a repo URL using repo url=theUrlOfTheRepo"}
+    
+    # Example Usage
+    print(url_repo)
+    full_git_path = "/repo_tmp/git_repo"  # Temporary directory for cloning
+
+    GIT_WORKING_DIR= get_full_path(full_git_path)
+    
+    # Clean up previous clone
+    if os.path.exists(GIT_WORKING_DIR):
+        shutil.rmtree(GIT_WORKING_DIR)
+
+    try:
+        # Clone the repo
+        subprocess.run(["git", "clone", url_repo, GIT_WORKING_DIR], check=True)
+
+        # Change directory to the repo
+        os.chdir(GIT_WORKING_DIR)
+
+        # Create a new file
+        file_path = os.path.join(GIT_WORKING_DIR, "update.txt")
+        with open(file_path, "w") as f:
+            f.write("Automated update.\n")
+
+        # Commit and push
+        subprocess.run(["git", "add", "update.txt"], check=True)
+        subprocess.run(["git", "commit", "-m", "Automated commit"], check=True)
+        subprocess.run(["git", "push", "origin", "main"], check=True)
+
+        return {"message": "Commit successful!"}
+
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Git operation failed: {e}"}
+
+
 
 # Task execution handler
 def execute_task(task_description: str):
@@ -267,6 +311,9 @@ def execute_task(task_description: str):
             return calculate_gold_ticket_sales()
         elif "comments" in content.lower() or "similarity" in content.lower() or "similar" in content.lower():
             return find_most_similar_comments(f"{config['root']}/comments.txt")
+        
+        elif "clone" in content.lower() or "commit" in content.lower():
+            return clone_and_commit(task_description)
         elif "delete" in content.lower() and "file" in content.lower():
             return "Task recognized, but no deletion is allowed."
         else:
@@ -311,6 +358,7 @@ if __name__ == "__main__":
     # print(execute_task("log write"))
     # print(execute_task("sort contacts"))
     # print(execute_task("count wednesday"))
-    print(execute_task("find total sales of gold tickets"))
-    print(execute_task("delete this file"))
+    # print(execute_task("find total sales of gold tickets"))
+    # print(execute_task("delete this file"))
     # print(execute_task("similar comments")
+    print(execute_task("clone commit repo url=https://github.com/octocat/Hello-World.git"))

@@ -5,3 +5,4 @@ openai
 asyncio
 python-dateutil
 numpy
+shutil
