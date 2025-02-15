@@ -153,8 +153,11 @@ def get_full_path(file_path: str):
     
 @app.get("/read")
 async def get_file(path: str = Query(..., title="File path to verify the exact output")):
+    
+    if not (path.startswith("/data") or path.startswith("data")):
+        raise HTTPException(status_code=400, detail="Access to this path is not allowed. Only files under '/data' are allowed.")
+    
     full_path = get_full_path(path)
-
     # Return the content of the specified file
     if os.path.exists(full_path):
         with open(full_path, 'r') as file:
@@ -162,9 +165,10 @@ async def get_file(path: str = Query(..., title="File path to verify the exact o
     else:
         raise HTTPException(status_code=404, detail="File not found")
     
+    
 @app.get("/")
 async def say_hello():
-    return "New Message 12345"
+    return "New Message from new Build"
 
 if __name__ == "__main__":
     path = "/data/dates.txt"
