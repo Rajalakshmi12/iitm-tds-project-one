@@ -374,7 +374,7 @@ def parse_files_and_create_index():
     with open(OUTPUT_FILE, "w", encoding="utf-8") as json_file:
         json.dump(index, json_file, indent=4)
 
-    print(f"Index file created at {OUTPUT_FILE}")
+    return f"Index file created at {OUTPUT_FILE}"
     
 # Task execution handler
 def execute_task(task_description: str):
