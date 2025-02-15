@@ -303,9 +303,10 @@ async def say_hello():
     return "Raji V7, Welcome to the custom API endpoints"
 
 if __name__ == "__main__":
+    print("Working")
     #Code3
     # print(execute_task("log write"))
     # print(execute_task("sort contacts"))
     # print(execute_task("count wednesday"))
     # print(execute_task("analyze sales for gold tickets"))
-    # print(execute_task("similar comments"))
+    # print(execute_task("similar comments")
