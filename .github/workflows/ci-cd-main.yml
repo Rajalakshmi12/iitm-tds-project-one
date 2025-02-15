@@ -49,7 +49,7 @@ jobs:
 
       # Push the Podman image to Docker Hub
       - name: Push Podman image
-        run: podman push rajalakshmi1205/project-llm:v1
+        run: podman push docker.io/rajalakshmi1205/project-llm:v1
              
       - name: Deploy to production (or staging)
         run: |
