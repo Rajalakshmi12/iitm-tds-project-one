@@ -116,8 +116,6 @@ def call_ai_proxy(prompt: str):
         return None
 
 
-
-
 def format_markdown(file_path: str):
     
     # Move this to a function
@@ -132,7 +130,11 @@ def format_markdown(file_path: str):
         os.system(f'npx prettier@3.4.2 --write "{full_path}"')
         print(f"Formatted: {full_path}")
 
-def calculate_gold_ticket_sales():
+def calculate_ticket_sales(desc):
+    prompt = f"Extract the metal type such as Gold Bronze Silver etc from the desc: {desc} return response only the type as string, example Gold "
+    ticket_resp = call_ai_proxy(prompt)
+    ticket_type = ticket_resp['choices'][0]['message']['content']
+
     # Config directory for storing files
     path = "/data/ticket-sales.db"
     output_path = "/data/ticket-sales-gold.txt"
@@ -145,7 +147,9 @@ def calculate_gold_ticket_sales():
         cursor = conn.cursor()
 
         # Query to calculate total sales for 'Gold' ticket type
-        cursor.execute("SELECT SUM(units * price) FROM tickets WHERE type = 'Gold'")
+        query = f"SELECT SUM(units * price) FROM tickets WHERE type = '{ticket_type}'"
+        print(query)
+        cursor.execute(query)
         total_sales = cursor.fetchone()[0] or 0  # Default to 0 if no sales
 
         # Write the total sales to the output file
@@ -398,8 +402,8 @@ def execute_task(task_description: str):
             return sort_contacts(f"{config['root']}/contacts.json")
         elif "log" in content.lower() and "write" in content.lower():
             return write_first_log_line(f"{config['root']}/logs/")
-        elif "total" in content.lower() and "ticket" in content.lower():
-            return calculate_gold_ticket_sales()
+        elif "total" in content.lower() and "sales" in content.lower():
+            return calculate_ticket_sales(task_description)
         elif "comments" in content.lower() or "similarity" in content.lower() or "similar" in content.lower():
             return find_most_similar_comments(f"{config['root']}/comments.txt")
         
@@ -453,9 +457,9 @@ if __name__ == "__main__":
     # print(execute_task("log write"))
     # print(execute_task("sort contacts"))
     # print(execute_task("count wednesday"))
-    # print(execute_task("find total sales of gold tickets"))
+    print(execute_task("find total sales of gold tickets"))
     # print(execute_task("delete this file"))
     # print(execute_task("similar comments")
     # print(execute_task("extract email"))
-    print(execute_task("extract markdown title"))
+    # print(execute_task("extract markdown title"))
     # print(execute_task("clone commit repo url=https://github.com/octocat/Hello-World.git"))
