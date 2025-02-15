@@ -52,10 +52,7 @@ jobs:
         run: podman push rajalakshmi1205/project-llm:v1
      
      
-     # Pull the Podman image
-      - name: Pull Podman image
-        run: podman pull rajalakshmi1205/project-llm:v1
-        
+     # Run the Podman image        
       - name: Run Podman container
         run: podman run -e AIPROXY_TOKEN=$AIPROXY_TOKEN -p 8000:8000 rajalakshmi1205/project-llm:v1
         
