@@ -5,6 +5,7 @@ from typing import Optional
 import asyncio
 import openai
 import uvicorn
+import base64
 import json
 import os
 import re
@@ -379,7 +380,64 @@ def parse_files_and_create_index():
         json.dump(index, json_file, indent=4)
 
     return f"Index file created at {OUTPUT_FILE}"
+
+def extract_credit_card_number():
+    IMAGE_PATH = get_full_path("/data/credit-card.png")
+    OUTPUT_FILE = get_full_path("/data/credit-card.txt")
+
+    if not os.path.exists(IMAGE_PATH):
+        print(f"Error: {IMAGE_PATH} does not exist.")
+        return
+
+    # Convert image to base64
+    with open(IMAGE_PATH, "rb") as img_file:
+        image_base64 = base64.b64encode(img_file.read()).decode("utf-8")
+
+    # OpenAI API for extracting text or number from Image
+    url = "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions"
+
+    headers = {
+        "Authorization": f"Bearer {AIPROXY_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "model": "gpt-4o-mini",
+        "messages": [
+            {"role": "system", "content": "Extract only the credit card number from the image and return it as a string with no spaces."},
+            {"role": "user", "content": [
+                {"type": "text", "content": "Here is an image of a credit card. Extract only the number, without spaces."},
+                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_base64}"}}
+            ]}
+        ],
+        "max_tokens": 50
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code != 200:
+        print(f"Error: Failed to extract text. {response.json()}")
+        return
+
+    response_data = response.json()
     
+    # Extract text response from API
+    if "choices" in response_data and response_data["choices"]:
+        extracted_text = response_data["choices"][0]["message"]["content"]
+
+        # Filter only numeric characters (removes spaces or dashes)
+        card_number = "".join(filter(str.isdigit, extracted_text))
+
+        if card_number:
+            with open(OUTPUT_FILE, "w", encoding="utf-8") as file:
+                file.write(card_number)
+            print(f"Credit card number extracted and saved: {OUTPUT_FILE}")
+        else:
+            print("Error: No valid credit card number found in response.")
+    else:
+        print("Error: No valid response from LLM.")
+        
+    return "Credit card number extracted and saved"    
+
 # Task execution handler
 def execute_task(task_description: str):
     # Generate a concise prompt based on the task description
@@ -413,6 +471,8 @@ def execute_task(task_description: str):
             return clone_and_commit(task_description)
         elif "markdown" in content.lower() and "title" in content.lower():
             return parse_files_and_create_index()
+        elif "number" in content.lower() and "card" in content.lower():
+            return extract_credit_card_number()
         elif "delete" in content.lower() and "file" in content.lower():
             return "Task recognized, but no deletion is allowed."
         else:
@@ -449,7 +509,7 @@ async def get_file(path: str = Query(..., title="File path to verify the exact o
 
 @app.get("/")
 async def say_hello():
-    return "Raji V7, Welcome to the custom API endpoints"
+    return "Raji V8, Welcome to the custom API endpoints"
 
 if __name__ == "__main__":
     print("Working")
@@ -457,7 +517,8 @@ if __name__ == "__main__":
     # print(execute_task("log write"))
     # print(execute_task("sort contacts"))
     # print(execute_task("count wednesday"))
-    print(execute_task("find total sales of gold tickets"))
+    # print(execute_task("find total sales of gold tickets"))
+    print(execute_task("extract credit card number"))
     # print(execute_task("delete this file"))
     # print(execute_task("similar comments")
     # print(execute_task("extract email"))
