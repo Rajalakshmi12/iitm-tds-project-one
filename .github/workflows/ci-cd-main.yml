@@ -46,6 +46,7 @@ jobs:
       # Build & push the Podman image
       -  name: Build the Podman image
          run: |
+           podman login docker.io
            podman build -t project-llm:v1 .
            podman tag project-llm:v1 docker.io/rajalakshmi1205/project-llm:v1
            podman push docker.io/rajalakshmi1205/project-llm:v1
