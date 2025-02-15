@@ -43,13 +43,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build the Podman image
-      - name: Build Podman image
-        run: podman build -t rajalakshmi1205/project-llm:v1 .
-
-      # Push the Podman image to Docker Hub
-      - name: Push Podman image
-        run: podman push docker.io/rajalakshmi1205/project-llm:v1
+      # Build & push the Podman image
+      -  name: Build the Podman image
+         run: |
+           podman build -t project-llm:v1 .
+           podman tag project-llm:v1 docker.io/rajalakshmi1205/project-llm:v1
+           podman push docker.io/rajalakshmi1205/project-llm:v1
              
       - name: Deploy to production (or staging)
         run: |
