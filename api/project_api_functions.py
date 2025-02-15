@@ -262,7 +262,7 @@ def execute_task(task_description: str):
             return sort_contacts(f"{config['root']}/contacts.json")
         elif "log" in content.lower() and "write" in content.lower():
             return write_first_log_line(f"{config['root']}/logs/")
-        elif "analyze" in content.lower() and "tickets" in content.lower():
+        elif "analyze" in content.lower() and "ticket" in content.lower():
             return calculate_gold_ticket_sales()
         elif "comments" in content.lower() or "similarity" in content.lower() or "similar" in content.lower():
             return find_most_similar_comments(f"{config['root']}/comments.txt")
