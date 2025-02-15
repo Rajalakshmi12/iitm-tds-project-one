@@ -255,7 +255,6 @@ def clone_and_commit(task: str):
 
     GIT_WORKING_DIR= get_full_path(full_git_path)
     
-
     try:
         # Clone the repo
         subprocess.run(["git", "clone", url_repo, GIT_WORKING_DIR], check=True)
@@ -278,6 +277,63 @@ def clone_and_commit(task: str):
     except subprocess.CalledProcessError as e:
         return {"error": f"Git operation failed: {e}"}
 
+
+def extract_email_address():
+
+    # Define file paths
+    EMAIL_FILE = get_full_path("/data/email.txt")
+    OUTPUT_FILE = get_full_path("/data/email-sender.txt")
+    
+    if not os.path.exists(EMAIL_FILE):
+        print(f"Error: {EMAIL_FILE} does not exist.")
+        return
+
+    # Read email content
+    with open(EMAIL_FILE, "r", encoding="utf-8") as file:
+        email_content = file.read()
+        
+    # API endpoint
+    url = "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions"
+
+    headers = {
+        "Authorization": f"Bearer {AIPROXY_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    # LLM Request
+    data = {
+        "model": "gpt-4o-mini",
+        "messages": [
+            {"role": "system", "content": "Extract only the sender's email address from the email text."},
+            {"role": "user", "content": email_content}
+        ],
+        "max_tokens": 50
+    }
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code != 200:
+        print(f"Error: Failed to extract email. {response.json()}")
+        return
+
+    response_data = response.json()
+
+    # Extract response
+    if "choices" in response_data and response_data["choices"]:
+        extracted_text = response_data["choices"][0]["message"]["content"]
+
+        # Use regex to extract the email address
+        email_match = re.search(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", extracted_text)
+        if email_match:
+            sender_email = email_match.group(0)
+
+            # Write email to file
+            with open(OUTPUT_FILE, "w", encoding="utf-8") as file:
+                file.write(sender_email)
+
+            print(f"Sender's email extracted and saved: {sender_email}")
+        else:
+            print("Error: No valid email found in the response.")
+    else:
+        print("Error: No valid response from LLM.")
 
 
 # Task execution handler
@@ -308,6 +364,8 @@ def execute_task(task_description: str):
         elif "comments" in content.lower() or "similarity" in content.lower() or "similar" in content.lower():
             return find_most_similar_comments(f"{config['root']}/comments.txt")
         
+        elif "email" in content.lower() and "extract" in content.lower():
+            return extract_email_address()
         elif "clone" in content.lower() or "commit" in content.lower():
             return clone_and_commit(task_description)
         elif "delete" in content.lower() and "file" in content.lower():
@@ -357,4 +415,5 @@ if __name__ == "__main__":
     # print(execute_task("find total sales of gold tickets"))
     # print(execute_task("delete this file"))
     # print(execute_task("similar comments")
-    print(execute_task("clone commit repo url=https://github.com/octocat/Hello-World.git"))
+    print(execute_task("extract email"))
+    # print(execute_task("clone commit repo url=https://github.com/octocat/Hello-World.git"))
