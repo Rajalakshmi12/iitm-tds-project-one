@@ -300,25 +300,12 @@ async def get_file(path: str = Query(..., title="File path to verify the exact o
 
 @app.get("/")
 async def say_hello():
-    return "Raji, Welcome to the custom API endpoints"
+    return "Raji V7, Welcome to the custom API endpoints"
 
 if __name__ == "__main__":
-    path = "/data/dates.txt"
-    
-    #Code1
-    full_path = get_full_path(path)
-
-    if os.path.exists(full_path):
-        with open(full_path, 'r') as file:
-            #print({"content exist": file.read()})
-            print("content exist")
-    else:
-        raise HTTPException(status_code=404, detail="File not found")
-    
     #Code3
     # print(execute_task("log write"))
     # print(execute_task("sort contacts"))
-    print(execute_task("count wednesday"))
-    print(execute_task("analyze sales for gold tickets"))
-    print(execute_task("similar comments"))
-    
+    # print(execute_task("count wednesday"))
+    # print(execute_task("analyze sales for gold tickets"))
+    # print(execute_task("similar comments"))
