@@ -157,7 +157,7 @@ async def say_hello():
     
     if os.path.exists(path):
         with open(path, 'r') as file:
-            print({"content": file.read()})
+            print({"Latest content": file.read()})
     else:
         raise HTTPException(status_code=404, detail="File not found")
 
